@@ -1,0 +1,291 @@
+<!-- weather-map.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherNow - Weather Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        nav {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .nav-links a.active {
+            border-bottom: 2px solid white;
+        }
+
+        .map-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .map-controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover,
+        .control-btn.active {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .map-display {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .map-canvas {
+            width: 100%;
+            height: 600px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .weather-marker {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .weather-marker:hover {
+            transform: scale(1.2);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .marker-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            display: none;
+            pointer-events: none;
+        }
+
+        .weather-marker:hover .marker-tooltip {
+            display: block;
+        }
+
+        .legend {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+
+        .legend-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .legend-items {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-icon {
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .map-canvas {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">🌤️ WeatherNow</div>
+        <ul class="nav-links">
+            <li><a href="weather-home.html">Home</a></li>
+            <li><a href="weather-current.html">Current</a></li>
+            <li><a href="weather-forecast.html">Forecast</a></li>
+            <li><a href="weather-map.html" class="active">Map</a></li>
+        </ul>
+    </nav>
+
+    <div class="map-container">
+        <h1 class="page-title">Interactive Weather Map</h1>
+
+        <div class="map-controls">
+            <button class="control-btn active" onclick="setLayer('temperature')">Temperature</button>
+            <button class="control-btn" onclick="setLayer('precipitation')">Precipitation</button>
+            <button class="control-btn" onclick="setLayer('wind')">Wind</button>
+            <button class="control-btn" onclick="setLayer('clouds')">Clouds</button>
+        </div>
+
+        <div class="map-display">
+            <div class="map-canvas" id="mapCanvas"></div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-title">Weather Conditions</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <span class="legend-icon">☀️</span>
+                    <span>Clear</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon">☁️</span>
+                    <span>Cloudy</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon">🌧️</span>
+                    <span>Rainy</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon">❄️</span>
+                    <span>Snowy</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon">⛈️</span>
+                    <span>Stormy</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cities = [
+            { name: 'Amsterdam', x: 45, y: 30, icon: '☁️', temp: 12 },
+            { name: 'London', x: 35, y: 35, icon: '🌧️', temp: 10 },
+            { name: 'Paris', x: 40, y: 42, icon: '☀️', temp: 15 },
+            { name: 'Berlin', x: 52, y: 32, icon: '☁️', temp: 11 },
+            { name: 'Rome', x: 50, y: 60, icon: '☀️', temp: 18 },
+            { name: 'Madrid', x: 28, y: 55, icon: '☀️', temp: 20 },
+            { name: 'Oslo', x: 48, y: 15, icon: '❄️', temp: 3 },
+            { name: 'Athens', x: 65, y: 65, icon: '☀️', temp: 22 }
+        ];
+
+        function initMap() {
+            const mapCanvas = document.getElementById('mapCanvas');
+            
+            cities.forEach(city => {
+                const marker = document.createElement('div');
+                marker.className = 'weather-marker';
+                marker.style.left = city.x + '%';
+                marker.style.top = city.y + '%';
+                marker.innerHTML = `
+                    ${city.icon}
+                    <div class="marker-tooltip">
+                        <strong>${city.name}</strong><br>
+                        ${city.temp}°C
+                    </div>
+                `;
+                mapCanvas.appendChild(marker);
+            });
+        }
+
+        function setLayer(layer) {
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // In a real app, this would update the map layer
+            console.log('Layer changed to:', layer);
+        }
+
+        window.addEventListener('load', initMap);
+    </script>
+</body>
+</html>

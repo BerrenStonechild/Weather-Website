@@ -1,0 +1,195 @@
+<!-- weather-forecast.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherNow - 7-Day Forecast</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        nav {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .nav-links a.active {
+            border-bottom: 2px solid white;
+        }
+
+        .forecast-container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .forecast-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem 1rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .forecast-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .day-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .forecast-icon {
+            font-size: 4rem;
+            margin: 1rem 0;
+        }
+
+        .temp-range {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .temp-high {
+            color: #ffeb3b;
+        }
+
+        .temp-low {
+            color: #90caf9;
+            opacity: 0.8;
+        }
+
+        .condition {
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .forecast-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">🌤️ WeatherNow</div>
+        <ul class="nav-links">
+            <li><a href="weather-home.html">Home</a></li>
+            <li><a href="weather-current.html">Current</a></li>
+            <li><a href="weather-forecast.html" class="active">Forecast</a></li>
+            <li><a href="weather-map.html">Map</a></li>
+        </ul>
+    </nav>
+
+    <div class="forecast-container">
+        <h1 class="page-title">7-Day Forecast</h1>
+        <div class="forecast-grid" id="forecastGrid"></div>
+    </div>
+
+    <script>
+        const weatherIcons = {
+            'Clear': '☀️',
+            'Clouds': '☁️',
+            'Rain': '🌧️',
+            'Snow': '❄️',
+            'Thunderstorm': '⛈️',
+            'Drizzle': '🌦️'
+        };
+
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        function generateForecast() {
+            const forecastGrid = document.getElementById('forecastGrid');
+            const today = new Date();
+            
+            let forecastHTML = '';
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                const dayName = i === 0 ? 'Today' : days[date.getDay()];
+                
+                const conditions = Object.keys(weatherIcons);
+                const condition = conditions[Math.floor(Math.random() * conditions.length)];
+                const high = Math.floor(Math.random() * 15) + 15;
+                const low = Math.floor(Math.random() * 10) + 5;
+                
+                forecastHTML += `
+                    <div class="forecast-card">
+                        <div class="day-name">${dayName}</div>
+                        <div class="forecast-icon">${weatherIcons[condition]}</div>
+                        <div class="temp-range">
+                            <span class="temp-high">${high}°</span> / 
+                            <span class="temp-low">${low}°</span>
+                        </div>
+                        <div class="condition">${condition}</div>
+                    </div>
+                `;
+            }
+            
+            forecastGrid.innerHTML = forecastHTML;
+        }
+
+        window.addEventListener('load', generateForecast);
+    </script>
+</body>
+</html>
