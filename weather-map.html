@@ -1,10 +1,9 @@
-<!-- weather-map.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeatherNow - Weather Map</title>
+    <title>WeatherNow - Interactive Weather Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * {
@@ -14,153 +13,361 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
             min-height: 100vh;
+            color: #1f2937;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 0.5rem 0;
             color: white;
+            font-size: 0.85rem;
+        }
+
+        .header-top-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-contact {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .header-contact a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .header-contact a:hover {
+            opacity: 1;
         }
 
         nav {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+
+        .brand-name {
             font-size: 1.8rem;
-            font-weight: 900;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-tagline {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 2rem;
+            gap: 2.5rem;
         }
 
         .nav-links a {
-            color: white;
+            color: #374151;
             text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.3s;
+            font-weight: 600;
+            transition: color 0.3s;
+            font-size: 0.95rem;
         }
 
-        .nav-links a:hover {
-            opacity: 0.7;
-        }
-
+        .nav-links a:hover,
         .nav-links a.active {
-            border-bottom: 2px solid white;
+            color: #1e3c72;
         }
 
+        /* Main Content */
         .map-container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 2rem auto;
             padding: 2rem;
         }
 
         .page-title {
             text-align: center;
-            font-size: 3rem;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
             margin-bottom: 2rem;
         }
 
         .map-controls {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: white;
             padding: 1.5rem;
-            border-radius: 15px;
+            border-radius: 16px;
             margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls-label {
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .controls-buttons {
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
-            justify-content: center;
         }
 
         .control-btn {
             padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 25px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: #f9fafb;
+            color: #374151;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 0.9rem;
         }
 
-        .control-btn:hover,
+        .control-btn:hover {
+            border-color: #1e3c72;
+            background: #f3f4f6;
+        }
+
         .control-btn.active {
-            background: rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-color: #1e3c72;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
         }
 
         .map-display {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 1rem;
-            border-radius: 20px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
         }
 
         #map {
             width: 100%;
             height: 600px;
-            border-radius: 15px;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
         .leaflet-popup-content-wrapper {
-            background: rgba(0, 0, 0, 0.9);
+            background: #1f2937;
             color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
         .leaflet-popup-tip {
-            background: rgba(0, 0, 0, 0.9);
+            background: #1f2937;
         }
 
         .popup-content {
             padding: 0.5rem;
         }
 
+        .popup-content strong {
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
         .popup-temp {
             font-size: 2rem;
             font-weight: 900;
             margin: 0.5rem 0;
+            color: #60a5fa;
         }
 
         .popup-description {
             text-transform: capitalize;
             margin-bottom: 0.5rem;
+            color: #d1d5db;
         }
 
         .legend {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem;
-            border-radius: 15px;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
             margin-top: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .legend-title {
             font-size: 1.2rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            color: #1f2937;
         }
 
         .legend-items {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.8rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
         }
 
-        @media (max-width: 768px) {
+        .legend-icon {
+            font-size: 1.8rem;
+        }
+
+        .legend-text {
+            font-size: 0.9rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            background: #1f2937;
+            color: #9ca3af;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .footer-section h4 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .footer-section p {
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: #374151;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .social-links a:hover {
+            background: #4b5563;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-bottom-links a {
+            color: #9ca3af;
+            text-decoration: none;
+        }
+
+        .footer-bottom-links a:hover {
+            color: white;
+        }
+
+        @media (max-width: 968px) {
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+
             .page-title {
                 font-size: 2rem;
             }
@@ -169,27 +376,61 @@
                 height: 400px;
             }
         }
+
+        @media (max-width: 640px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header-contact {
+                display: none;
+            }
+
+            .legend-items {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="logo">🌤️ WeatherNow</div>
-        <ul class="nav-links">
-            <li><a href="indedx.html.html">Home</a></li>
-            <li><a href="weather-current.html">Current</a></li>
-            <li><a href="weather-forecast.html">Forecast</a></li>
-            <li><a href="weather-map.html" class="active">Map</a></li>
-        </ul>
-    </nav>
+    <header>
+        <div class="header-top">
+            <div class="header-top-content">
+                <div class="header-contact">
+                    <a href="mailto:info@weathernow.com">📧 info@weathernow.com</a>
+                    <a href="tel:+1234567890">📞 +1 (234) 567-890</a>
+                </div>
+                <div>Available 24/7 | Real-time Updates</div>
+            </div>
+        </div>
+        <nav>
+            <div class="logo-container">
+                <div class="logo">🌤️</div>
+                <div>
+                    <div class="brand-name">WeatherNow</div>
+                    <div class="brand-tagline">PROFESSIONAL WEATHER SERVICES</div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="weather-home.html">Home</a></li>
+                <li><a href="weather-current.html">Current</a></li>
+                <li><a href="weather-forecast.html">Forecast</a></li>
+                <li><a href="weather-map.html" class="active">Map</a></li>
+            </ul>
+        </nav>
+    </header>
 
     <div class="map-container">
         <h1 class="page-title">Interactive Weather Map</h1>
 
         <div class="map-controls">
-            <button class="control-btn active" onclick="setLayer('temp')">Temperature</button>
-            <button class="control-btn" onclick="setLayer('clouds')">Clouds</button>
-            <button class="control-btn" onclick="setLayer('precipitation')">Precipitation</button>
-            <button class="control-btn" onclick="setLayer('wind')">Wind Speed</button>
+            <div class="controls-label">Select Weather Layer</div>
+            <div class="controls-buttons">
+                <button class="control-btn active" onclick="setLayer('temp')">🌡️ Temperature</button>
+                <button class="control-btn" onclick="setLayer('clouds')">☁️ Cloud Coverage</button>
+                <button class="control-btn" onclick="setLayer('precipitation')">🌧️ Precipitation</button>
+                <button class="control-btn" onclick="setLayer('wind')">💨 Wind Speed</button>
+            </div>
         </div>
 
         <div class="map-display">
@@ -197,27 +438,92 @@
         </div>
 
         <div class="legend">
-            <div class="legend-title">Weather Layers</div>
+            <div class="legend-title">Understanding Weather Layers</div>
             <div class="legend-items">
                 <div class="legend-item">
-                    <span>🌡️</span>
-                    <span>Temperature overlay</span>
+                    <span class="legend-icon">🌡️</span>
+                    <div>
+                        <strong style="color: #1f2937; display: block; margin-bottom: 0.2rem;">Temperature</strong>
+                        <span class="legend-text">Real-time temperature readings across regions</span>
+                    </div>
                 </div>
                 <div class="legend-item">
-                    <span>☁️</span>
-                    <span>Cloud coverage</span>
+                    <span class="legend-icon">☁️</span>
+                    <div>
+                        <strong style="color: #1f2937; display: block; margin-bottom: 0.2rem;">Clouds</strong>
+                        <span class="legend-text">Current cloud coverage and density patterns</span>
+                    </div>
                 </div>
                 <div class="legend-item">
-                    <span>🌧️</span>
-                    <span>Precipitation levels</span>
+                    <span class="legend-icon">🌧️</span>
+                    <div>
+                        <strong style="color: #1f2937; display: block; margin-bottom: 0.2rem;">Precipitation</strong>
+                        <span class="legend-text">Active rainfall and precipitation levels</span>
+                    </div>
                 </div>
                 <div class="legend-item">
-                    <span>💨</span>
-                    <span>Wind speed patterns</span>
+                    <span class="legend-icon">💨</span>
+                    <div>
+                        <strong style="color: #1f2937; display: block; margin-bottom: 0.2rem;">Wind Speed</strong>
+                        <span class="legend-text">Wind velocity and direction indicators</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>About WeatherNow</h4>
+                <p>WeatherNow provides professional-grade weather forecasting services to millions of users worldwide. Our mission is to deliver accurate, reliable weather information when you need it most.</p>
+                <div class="social-links">
+                    <a href="#">📘</a>
+                    <a href="#">🐦</a>
+                    <a href="#">📸</a>
+                    <a href="#">💼</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="weather-current.html">Current Weather</a></li>
+                    <li><a href="weather-forecast.html">7-Day Forecast</a></li>
+                    <li><a href="weather-map.html">Weather Map</a></li>
+                    <li><a href="#">Weather Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press Kit</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">API Documentation</a></li>
+                    <li><a href="#">Weather Alerts</a></li>
+                    <li><a href="#">Report Issue</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 WeatherNow Inc. All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+                <a href="#">Accessibility</a>
+                <a href="#">Data Sources</a>
+                <a href="#">Sitemap</a>
+            </div>
+        </div>
+    </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -267,7 +573,7 @@
             weatherLayer = L.tileLayer(
                 'https://tile.openweathermap.org/map/' + layers[currentLayer] + '/{z}/{x}/{y}.png?appid=' + API_KEY,
                 {
-                    attribution: 'Weather from OpenWeatherMap',
+                    attribution: 'Weather data © OpenWeatherMap',
                     opacity: 0.6
                 }
             ).addTo(map);
@@ -280,7 +586,9 @@
                 { name: 'Berlin', lat: 52.5200, lon: 13.4050 },
                 { name: 'Madrid', lat: 40.4168, lon: -3.7038 },
                 { name: 'Rome', lat: 41.9028, lon: 12.4964 },
-                { name: 'Amsterdam', lat: 52.3676, lon: 4.9041 }
+                { name: 'Amsterdam', lat: 52.3676, lon: 4.9041 },
+                { name: 'Vienna', lat: 48.2082, lon: 16.3738 },
+                { name: 'Athens', lat: 37.9838, lon: 23.7275 }
             ];
 
             for (const city of majorCities) {
@@ -304,7 +612,7 @@
                         '<strong>' + data.name + '</strong>' +
                         '<div class="popup-temp">' + Math.round(data.main.temp) + '°C</div>' +
                         '<div class="popup-description">' + data.weather[0].description + '</div>' +
-                        '<div>💧 ' + data.main.humidity + '% | 💨 ' + data.wind.speed + ' m/s</div>' +
+                        '<div style="color: #d1d5db;">💧 ' + data.main.humidity + '% | 💨 ' + data.wind.speed + ' m/s</div>' +
                         '</div>';
 
                     marker.bindPopup(popupHTML);

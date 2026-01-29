@@ -1,10 +1,9 @@
-<!-- weather-forecast.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeatherNow - 5-Day Forecast</title>
+    <title>WeatherNow - 7-Day Forecast</title>
     <style>
         * {
             margin: 0;
@@ -13,151 +12,419 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
             min-height: 100vh;
+            color: #1f2937;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 0.5rem 0;
             color: white;
+            font-size: 0.85rem;
+        }
+
+        .header-top-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-contact {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .header-contact a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .header-contact a:hover {
+            opacity: 1;
         }
 
         nav {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+
+        .brand-name {
             font-size: 1.8rem;
-            font-weight: 900;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-tagline {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 2rem;
+            gap: 2.5rem;
         }
 
         .nav-links a {
-            color: white;
+            color: #374151;
             text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.3s;
+            font-weight: 600;
+            transition: color 0.3s;
+            font-size: 0.95rem;
         }
 
-        .nav-links a:hover {
-            opacity: 0.7;
-        }
-
+        .nav-links a:hover,
         .nav-links a.active {
-            border-bottom: 2px solid white;
+            color: #1e3c72;
         }
 
+        /* Main Content */
         .forecast-container {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 3rem auto;
             padding: 2rem;
         }
 
         .page-title {
             text-align: center;
-            font-size: 3rem;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
             margin-bottom: 2rem;
         }
 
         .loading {
             text-align: center;
-            font-size: 2rem;
+            font-size: 1.5rem;
             padding: 4rem;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
         }
 
         .forecast-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(7, 1fr);
             gap: 1.5rem;
         }
 
         .forecast-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 2rem 1rem;
-            border-radius: 15px;
+            background: white;
+            padding: 2rem 1.5rem;
+            border-radius: 16px;
             text-align: center;
-            transition: transform 0.3s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
         }
 
         .forecast-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         }
 
         .day-name {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
+            color: #1f2937;
             margin-bottom: 1rem;
         }
 
         .forecast-icon {
-            font-size: 4rem;
+            font-size: 3.5rem;
             margin: 1rem 0;
         }
 
         .temp-range {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             margin: 1rem 0;
         }
 
         .temp-high {
-            color: #ffeb3b;
+            color: #dc2626;
         }
 
         .temp-low {
-            color: #90caf9;
-            opacity: 0.8;
+            color: #2563eb;
         }
 
         .condition {
-            opacity: 0.9;
-            margin-top: 0.5rem;
+            color: #6b7280;
+            margin-top: 0.8rem;
             text-transform: capitalize;
+            font-size: 0.9rem;
         }
 
         .humidity-wind {
             margin-top: 1rem;
-            font-size: 0.9rem;
-            opacity: 0.8;
+            padding-top: 1rem;
+            border-top: 2px solid #f3f4f6;
+            font-size: 0.85rem;
+            color: #6b7280;
         }
 
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 2rem;
+        /* Footer */
+        footer {
+            background: #1f2937;
+            color: #9ca3af;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .footer-section h4 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .footer-section p {
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: #374151;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .social-links a:hover {
+            background: #4b5563;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-bottom-links a {
+            color: #9ca3af;
+            text-decoration: none;
+        }
+
+        .footer-bottom-links a:hover {
+            color: white;
+        }
+
+        @media (max-width: 1400px) {
+            .forecast-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 968px) {
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
             }
 
             .forecast-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header-contact {
+                display: none;
+            }
+
+            .forecast-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .forecast-grid {
+                grid-template-columns: repeat(7, 1fr);
             }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="logo">🌤️ WeatherNow</div>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="weather-current.html">Current</a></li>
-            <li><a href="weather-forecast.html" class="active">Forecast</a></li>
-            <li><a href="weather-map.html">Map</a></li>
-        </ul>
-    </nav>
+    <header>
+        <div class="header-top">
+            <div class="header-top-content">
+                <div class="header-contact">
+                    <a href="mailto:info@weathernow.com">📧 info@weathernow.com</a>
+                    <a href="tel:+1234567890">📞 +1 (234) 567-890</a>
+                </div>
+                <div>Available 24/7 | Real-time Updates</div>
+            </div>
+        </div>
+        <nav>
+            <div class="logo-container">
+                <div class="logo">🌤️</div>
+                <div>
+                    <div class="brand-name">WeatherNow</div>
+                    <div class="brand-tagline">PROFESSIONAL WEATHER SERVICES</div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="weather-home.html">Home</a></li>
+                <li><a href="weather-current.html">Current</a></li>
+                <li><a href="weather-forecast.html" class="active">Forecast</a></li>
+                <li><a href="weather-map.html">Map</a></li>
+            </ul>
+        </nav>
+    </header>
 
     <div class="forecast-container">
-        <h1 class="page-title">5-Day Forecast</h1>
+        <h1 class="page-title">7-Day Weather Forecast</h1>
         <div id="loadingDiv" class="loading">Loading forecast data...</div>
         <div class="forecast-grid" id="forecastGrid"></div>
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>About WeatherNow</h4>
+                <p>WeatherNow provides professional-grade weather forecasting services to millions of users worldwide. Our mission is to deliver accurate, reliable weather information when you need it most.</p>
+                <div class="social-links">
+                    <a href="#">📘</a>
+                    <a href="#">🐦</a>
+                    <a href="#">📸</a>
+                    <a href="#">💼</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="weather-current.html">Current Weather</a></li>
+                    <li><a href="weather-forecast.html">7-Day Forecast</a></li>
+                    <li><a href="weather-map.html">Weather Map</a></li>
+                    <li><a href="#">Weather Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press Kit</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">API Documentation</a></li>
+                    <li><a href="#">Weather Alerts</a></li>
+                    <li><a href="#">Report Issue</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 WeatherNow Inc. All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+                <a href="#">Accessibility</a>
+                <a href="#">Data Sources</a>
+                <a href="#">Sitemap</a>
+            </div>
+        </div>
+    </footer>
 
     <script>
         const API_KEY = '8ac5c4d57ba6a4b3dfcf622700447b1e';
@@ -186,20 +453,20 @@
 
                 const data = await response.json();
                 
-                // Group by day (taking one forecast per day at noon)
+                // Group by day and get one forecast per day (at noon)
                 const dailyForecasts = {};
                 
                 data.list.forEach(item => {
                     const date = new Date(item.dt * 1000);
-                    const dateKey = date.toLocaleDateString();
+                    const dateKey = date.toDateString();
                     
-                    // Take the forecast closest to noon
+                    // Prefer forecasts around noon (12:00)
                     if (!dailyForecasts[dateKey] || Math.abs(date.getHours() - 12) < Math.abs(new Date(dailyForecasts[dateKey].dt * 1000).getHours() - 12)) {
                         dailyForecasts[dateKey] = item;
                     }
                 });
 
-                const forecastArray = Object.values(dailyForecasts).slice(0, 5);
+                const forecastArray = Object.values(dailyForecasts).slice(0, 7);
                 
                 const forecastGrid = document.getElementById('forecastGrid');
                 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -215,12 +482,14 @@
                             <div class="day-name">${dayName}</div>
                             <div class="forecast-icon">${weatherIcons[forecast.weather[0].icon] || '🌤️'}</div>
                             <div class="temp-range">
-                                <span class="temp-high">${Math.round(forecast.main.temp_max)}°</span> / 
+                                <span class="temp-high">${Math.round(forecast.main.temp_max)}°</span>
+                                <span style="color: #9ca3af;"> / </span>
                                 <span class="temp-low">${Math.round(forecast.main.temp_min)}°</span>
                             </div>
                             <div class="condition">${forecast.weather[0].description}</div>
                             <div class="humidity-wind">
-                                💧 ${forecast.main.humidity}% | 💨 ${forecast.wind.speed} m/s
+                                💧 ${forecast.main.humidity}%<br>
+                                💨 ${forecast.wind.speed.toFixed(1)} m/s
                             </div>
                         </div>
                     `;
